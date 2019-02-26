@@ -1,13 +1,8 @@
 from flask import request, json, jsonify
 import os
-from pathlib import Path
 
-# from ..utils.crypt import encrypt, decrypt
-from . import router, baseLocation, getQuiz
-
-quizzesFileLocation = baseLocation / "data" / "quizzes-file.json"
-questionFileLocation = baseLocation / "data" / "question-file.json"
-
+from . import router, getQuiz, questionFileLocation, quizzesFileLocation
+from ..utils.file import readFile, writeFile
 
 
 @router.route('/question', methods=['POST'])
@@ -18,13 +13,12 @@ def createQuestion():
         "questions": []
     }
 
-    if os.path.exists(questionFileLocation) and os.path.getsize(quizzesFileLocation) > 0:
-        questionFile = open(questionFileLocation, 'r')
-        questionData = json.load(questionFile)
+    if os.path.exists(questionFileLocation) :
+        questionData = readFile(questionFileLocation)
 
-    questionFile = open(questionFileLocation, 'w')
     questionData["questions"].append(body)
-    questionFile.write(str(json.dumps(questionData)))
+
+    writeFile(questionFileLocation, questionData)
 
     return jsonify(questionData)
 
@@ -49,8 +43,7 @@ def updateDeleteQuestion(quizId, questionNumber):
         return updateQuestion(quizId, questionNumber)
 
 def deleteQuestion(quizId, questionNumber):
-    questionsFile = open(questionFileLocation)
-    questionData = json.load(questionsFile)
+    questionData = readFile(questionFileLocation)
     
     questionToBeDeleted = getThatQuestion(int(quizId), int(questionNumber)).json # ambil dari fungsi getThatQuestion
 
@@ -62,16 +55,15 @@ def deleteQuestion(quizId, questionNumber):
         # else:
         #     message = "Gagal menghapus. Tidak ada quiz-id " + quizId + " atau question Number " + questionNumber
 
-    questionsFile = open(questionFileLocation, 'w')
-    questionsFile.write(str(json.dumps(questionData)))
+    
+    writeFile(questionFileLocation, questionData)
 
     return jsonify(questionData)
 
 def updateQuestion(quizId, questionNumber):
     body = request.json
     
-    questionsFile = open(questionFileLocation)
-    questionData = json.load(questionsFile)
+    questionData = readFile(questionFileLocation)
 
     questionToBeUpdated = getThatQuestion(int(quizId), int(questionNumber)).json # ambil dari fungsi getThatQuestion
     
@@ -87,7 +79,6 @@ def updateQuestion(quizId, questionNumber):
             questionData["questions"][i]["options"]["D"] = body["options"]["D"]
             break
 
-    questionsFile = open(questionFileLocation, 'w')
-    questionsFile.write(str(json.dumps(questionData)))
+    writeFile(questionFileLocation,questionData)
 
     return jsonify(questionData)
