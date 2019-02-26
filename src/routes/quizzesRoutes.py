@@ -15,6 +15,7 @@ def createQuiz():
         "quizzes": []
     }    
 
+
     if os.path.exists(quizzesFileLocation) and os.path.getsize(quizzesFileLocation) > 0:
         quizData = readFile(quizzesFileLocation)
 
