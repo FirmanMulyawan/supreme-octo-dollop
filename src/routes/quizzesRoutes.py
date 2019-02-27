@@ -6,6 +6,7 @@ from ..utils.file import readFile, writeFile
 from ..utils.authorization import verifyLogin
 
 @router.route('/quiz', methods=['POST'])
+@verifyLogin
 def createQuiz():
     body = request.json
     print("username adalah", g.username)
@@ -27,30 +28,50 @@ def createQuiz():
     return jsonify(quizData)
 
 
-@router.route('/quizzes/<quizId>')
-@verifyLogin
+@router.route('/quizzes/<quizId>')  #kalau gaada methodnya itu defaulnya ["GET"]
+# @verifyLogin
 def getQuiz(quizId):
+    isQuizFound = False
+    response = {
+        "error": True
+    }
+
     # nyari quiznya
-    quizzesData = readFile(quizzesFileLocation)
+    try:
+        quizzesData = readFile(quizzesFileLocation)
+    except:
+        response["message"] = "error load quiz data"
+    else:
 
-    print("usernamenya adalah", g.username)
+    # print("usernamenya adalah", g.username)
 
-    quizFound = False
-    for quiz in quizzesData["quizzes"]:
-        if quiz["quiz-id"] == int(quizId):
-            quizData = quiz
-            quizFound = True
-            break
+    # quizFound = False
+        for quiz in quizzesData["quizzes"]:
+            if quiz["quiz-id"] == int(quizId):
+                quizData = quiz
+                quizFound = True
 
-    if not quizFound:
-        return jsonify("quiz-id " + str(quizId) + " tidak ditemukan")
+                response["error"] = False
+                response["data"] = quizData
+
+                break
+
+    if isQuizFound:
     # nyari soalnya
+        try:
+            questionData = readFile(questionData)
+        except:
+            print("file question ga ada")
+        else:
+    #     return jsonify("quiz-id " + str(quizId) + " tidak ditemukan")
     
-    questionData = readFile(questionFileLocation)
+    # questionData = readFile(questionFileLocation)
 
-    for question in questionData["questions"]:
-        if question["quiz-id"] == int(quizId):
-            quizData["question-list"].append(question)
+            for question in questionData["questions"]:
+                if question["quiz-id"] == int(quizId):
+                    quizData["question-list"].append(question)
+    else:
+        response["message"] =  "no quiz found, komo question"
 
     return jsonify(quizData)
 

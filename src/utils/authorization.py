@@ -16,7 +16,7 @@ def verifyLogin(f):
     @wraps(f)
     def decoratedFunction(*args, **kwargs):
 
-        token = request.header["authorization"][:7]
+        token = request.headers["authorization"][:7]
 
         data = decode(token)
         username = decrypt(data["data"])
