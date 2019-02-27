@@ -20,6 +20,7 @@ def verifyLogin(f):
 
         data = decode(token)
         username = decrypt(data["data"])
-
+        g.username = username
+        
         return f(*args, **kwargs)
     return decoratedFunction

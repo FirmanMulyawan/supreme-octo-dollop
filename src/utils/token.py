@@ -14,5 +14,5 @@ def encode(data):
 
 
 def decode():
-    decoded = jwt.decode(eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoibWFrZXJzIn0.a6VqF1oQpUOZjU5U7diD9FvcStirR2A08STBsTBNvcY, "kucing-merah", algorithms=["HS256"])
-    return str(decoded)
+    decoded = jwt.decode(data, "kucing-merah", algorithms=["HS256"])
+    return decoded

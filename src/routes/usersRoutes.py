@@ -1,8 +1,8 @@
 from flask import request, json, jsonify
 import os
 
-from import router, usersFileLocation
-
+# from router import, usersFileLocation
+from . import router, usersFileLocation
 from ..utils.crypt import encrypt, decrypt
 from ..utils.file import readFile, writeFile
 from ..utils.authorization import generateToken

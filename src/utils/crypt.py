@@ -1,6 +1,8 @@
+#encrypt pake caesar chipper
 shift = 2
+alphanumeric = 'abcdefghijklmnopqrstuvwxyz0123456789'
+
 def encrypt(password):
-    alphanumeric = 'abcdefghijklmnopqrstuvwxyz0123456789'
     listAlphanumeric = list(alphanumeric)
     listPassword = list(password)    
     
@@ -14,7 +16,6 @@ def encrypt(password):
 
 # decrypt pake caesar chiper
 def decrypt(password):
-    alphanumeric = 'abcdefghijklmnopqrstuvwxyz0123456789'
     listAlphanumeric = list(alphanumeric)
     listPassword = list(password)
     

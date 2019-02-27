@@ -1,8 +1,8 @@
 from flask import json
 
 def writeFile(fileLocation, data):
-    theFile = open(fileLocation, "w")
-    theFile.write(str(json.dumps(data)))    
+    TheFile = open(fileLocation, "w")
+    TheFile.write(str(json.dumps(data)))    
 
 def readFile(fileLocation):
     theFile = open(fileLocation)
