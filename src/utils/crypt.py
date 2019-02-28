@@ -1,4 +1,3 @@
-#encrypt pake caesar chipper
 shift = 2
 alphanumeric = 'abcdefghijklmnopqrstuvwxyz0123456789'
 

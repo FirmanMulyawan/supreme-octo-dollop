@@ -10,8 +10,8 @@ questionFileLocation = baseLocation / "data" / "question-file.json"
 gamesFileLocation = baseLocation / "data" / "games-file.json"
 usersFileLocation = baseLocation / "data" / "users-file.json"
 
-
 from .usersRoutes import *
 from .quizzesRoutes import *
 from .questionsRoutes import *
 from .gamesRoutes import *
+from .errorRoutes import *
