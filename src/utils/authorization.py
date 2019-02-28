@@ -9,18 +9,20 @@ import jwt
 def generateToken(data):
     data = encrypt(data)
     token = encode(data)
-
+    
     return token
 
 def verifyLogin(f):
     @wraps(f)
     def decoratedFunction(*args, **kwargs):
+        # body = request.json
+        # if "Authorization" 
 
-        token = request.headers["authorization"][:7]
+        token = request.headers["Authorization"][7:]
 
         data = decode(token)
         username = decrypt(data["data"])
         g.username = username
-        
+
         return f(*args, **kwargs)
     return decoratedFunction

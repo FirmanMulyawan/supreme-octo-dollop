@@ -5,20 +5,23 @@ from . import router, quizzesFileLocation, questionFileLocation
 from ..utils.file import readFile, writeFile
 from ..utils.authorization import verifyLogin
 
-@router.route('/quiz', methods=['POST'])
+# bikin kuis baru
+@router.route('/quizzes', methods=['POST'])
 @verifyLogin
 def createQuiz():
     body = request.json
-    print("username adalah", g.username)
+    print("usernamenya adalah",g.username)
 
     quizData = {
         "total-quiz-available": 0,
         "quizzes": []
     }    
 
-
-    if os.path.exists(quizzesFileLocation) and os.path.getsize(quizzesFileLocation) > 0:
+    # if os.path.exists(quizzesFileLocation) and os.path.getsize(quizzesFileLocation) > 0:
+    try:
         quizData = readFile(quizzesFileLocation)
+    except:
+        print("File ga ada cuy")
 
     quizData["total-quiz-available"] += 1
     quizData["quizzes"].append(body)
@@ -27,64 +30,57 @@ def createQuiz():
 
     return jsonify(quizData)
 
-
-@router.route('/quizzes/<quizId>')  #kalau gaada methodnya itu defaulnya ["GET"]
-# @verifyLogin
+# meminta data kuis dan soalnya
+@router.route('/quizzes/<quizId>')
 def getQuiz(quizId):
+    # nyari quiznya
     isQuizFound = False
     response = {
         "error": True
     }
 
-    # nyari quiznya
     try:
         quizzesData = readFile(quizzesFileLocation)
     except:
         response["message"] = "error load quiz data"
+        return jsonify(response)
     else:
-
-    # print("usernamenya adalah", g.username)
-
-    # quizFound = False
         for quiz in quizzesData["quizzes"]:
             if quiz["quiz-id"] == int(quizId):
                 quizData = quiz
-                quizFound = True
+                isQuizFound = True
 
                 response["error"] = False
                 response["data"] = quizData
-
                 break
-
+            
     if isQuizFound:
-    # nyari soalnya
+        # nyari soalnya
         try:
-            questionData = readFile(questionData)
+            questionData = readFile(questionsFileLocation)
         except:
-            print("file question ga ada")
+            print("File questions gada")
         else:
-    #     return jsonify("quiz-id " + str(quizId) + " tidak ditemukan")
-    
-    # questionData = readFile(questionFileLocation)
-
             for question in questionData["questions"]:
                 if question["quiz-id"] == int(quizId):
                     quizData["question-list"].append(question)
     else:
-        response["message"] =  "no quiz found, komo question"
+        response["message"] = "no quiz found"
 
-    return jsonify(quizData)
+    return jsonify(response)
 
-
+# delete quis sama ubah informasi tentang kuisnya
 @router.route('/quizzes/<quizId>', methods=["PUT", "DELETE"])
+@verifyLogin
 def updateDeleteQuiz(quizId):
+    print("usernamenya adalah",g.username)
     if request.method == "DELETE":
         return deleteQuiz(quizId)
     elif request.method == "PUT":
         return updateQuiz(quizId)
 
 # fungsi hapus quiz berdasarkan quiz-id
-def deleteQuiz(quizId):    
+def deleteQuiz(quizId):
     quizData = readFile(quizzesFileLocation)
 
     for i in range(len(quizData["quizzes"])):
@@ -98,12 +94,11 @@ def deleteQuiz(quizId):
         # else:
         #     message = "Gagal menghapus. Tidak ada quiz-id " + quizId
 
-    #save ke file
-    
+    # save ke file
     writeFile(quizzesFileLocation, quizData)
 
     # nyari question sesuai quiz-id lalu hapus 
-    questionData = readFile(questionFileLocation)
+    questionData = readFile(questionsFileLocation)
 
     # message2 = ""
     # looping ini sisa 1 question dg quiz-id sama, belum bisa semua hapus dalam 1 for(karena out of range)
@@ -124,15 +119,21 @@ def deleteQuiz(quizId):
             # message2 = " dan menghapus semua questionnya "
             break
 
-  
-    writeFile(questionFileLocation, questionData)
+    writeFile(questionsFileLocation, questionData)
 
     return jsonify(quizData)
 
+# fungsi ubah quiz berdasarkan quiz-id
 def updateQuiz(quizId):
     body = request.json
     
     quizData = readFile(quizzesFileLocation)
+
+    # pake spread
+    # quizData = {
+    #     **json.loads(quizData["quizzes"]),
+    #     **body
+    # }
 
     for i in range(len(quizData["quizzes"])):
         quiz = quizData["quizzes"][i]
@@ -147,6 +148,7 @@ def updateQuiz(quizId):
             break
         # else:
         #     message = "Gagal mengubah. Tidak ada quiz-id " + quizId
-    writeFile(quizzesFileLocation,quizData)
+
+    writeFile(quizzesFileLocation, quizData)
 
     return jsonify(quizData)

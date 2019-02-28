@@ -1,30 +1,49 @@
 from flask import request, json, jsonify
 import os
 
-# from router import, usersFileLocation
 from . import router, usersFileLocation
+
 from ..utils.crypt import encrypt, decrypt
 from ..utils.file import readFile, writeFile
 from ..utils.authorization import generateToken
 
 
-#registrasi
+# registrasi
 @router.route('/users', methods=['POST'])
 def registration():
-    print(os.getenv("API_KEY"))
+    isUsernameOrEmailUsed = False
     body = request.json
-    body["password"] = encrypt(body["password"]) # encrypt dulu password sebelum masuk database
     
-    userData = []
+    response = {
+        "error": False
+    }
+    
+    usersData = {
+        "total-user-registered": 0,
+        "user-list": []
+    }
 
-    if os.path.exists(usersFileLocation) and os.path.getsize(usersFileLocation) > 0:
-        userData = readFile(usersFileLocation)     
+    try:
+        usersData = readFile(usersFileLocation)
+    except:
+        print("file ga ketemu/error")
+    else:
+        for data in usersData["user-list"]:
+            if data["username"] == body["username"] or data["email"] == body["email"]:
+                isUsernameOrEmailUsed = True
+    
+    if not isUsernameOrEmailUsed:
+        usersData["total-user-registered"] += 1
+        body["password"] = encrypt(body["password"])
+        usersData["user-list"].append(body)        
+        
+        response["data"] = body
+        writeFile(usersFileLocation, usersData)
+    else:
+        del body["password"]
+        response["message"] = "username of email is used"
 
-    userData.append(body)
-
-    writeFile(usersFileLocation, userData)
-
-    return jsonify(userData)
+    return jsonify(response)
 
 @router.route('/users/login', methods=['POST'])
 def login():
@@ -33,20 +52,20 @@ def login():
     usersData = readFile(usersFileLocation)
 
     isLogin = False
-    #password Matched = False
+    # passwordMatched = False
 
-    for user in usersData:        
+    for user in usersData["user-list"]:        
         if user["username"] == body["username"]:
             # userFound = True
             if decrypt(user["password"]) == body["password"]: # password di database di-decrypt dulu
-                isLogin = True                
+                isLogin = True
                 body["token"] = generateToken(body["username"])
                 break
 
     body["status"] = isLogin
     if isLogin:
-        body["message"] = "berhasil login"
+        body["message"] = "Berhasil Login"
     else:
-        body["message"] = "username atau password tidak sesuai"
+        body["message"] = "Username atau password tidak sesuai"
 
     return jsonify(body)
