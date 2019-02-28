@@ -19,12 +19,12 @@ def jwtDecode():
     decoded = jwt.decode(request.json["token"], "kucing-merah", algorithms=["HS256"])
     return str(decoded)
 
-@app.route('/penjumlahan/<firstNumber>/<secondNumber>')
-def penjumlahan(firstName, secondName):
+@app.route('/penjumlahan/<int:firtsNumber>/<int:secondNumber>')
+def penjumlahan(firtsNumber, secondNumber):
     return jsonify({
-        "hasil_jumlah": firstName+secondName,
-        "mancing_mania": "mantap"
-    })
+        "hasil_jumlah": int(firtsNumber)+int(secondNumber),
+        "tv_one":"memang mantul"
+        })
 
 
 if __name__ == "__main__":
