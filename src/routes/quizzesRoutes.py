@@ -17,7 +17,6 @@ def createQuiz():
         "quizzes": []
     }    
 
-    # if os.path.exists(quizzesFileLocation) and os.path.getsize(quizzesFileLocation) > 0:
     try:
         quizData = readFile(quizzesFileLocation)
     except:
@@ -57,7 +56,7 @@ def getQuiz(quizId):
     if isQuizFound:
         # nyari soalnya
         try:
-            questionData = readFile(questionsFileLocation)
+            questionData = readFile(questionFileLocation)
         except:
             print("File questions gada")
         else:
@@ -75,6 +74,7 @@ def getQuiz(quizId):
 def updateDeleteQuiz(quizId):
     print("usernamenya adalah",g.username)
     if request.method == "DELETE":
+        print("mau delete")
         return deleteQuiz(quizId)
     elif request.method == "PUT":
         return updateQuiz(quizId)
@@ -88,7 +88,7 @@ def deleteQuiz(quizId):
 
         if quiz["quiz-id"] == int(quizId): # nyari indeks quiz yg akan dihapus
             del quizData["quizzes"][i] # hapus quiz
-            quizData["total-quiz-available"] -= 1 # kurangi total quiz
+            quizData["total-quiz-available"] -= 1   # kurangi total quiz
             # message = "Berhasil menghapus quiz id " + quizId
             break
         # else:
@@ -98,7 +98,7 @@ def deleteQuiz(quizId):
     writeFile(quizzesFileLocation, quizData)
 
     # nyari question sesuai quiz-id lalu hapus 
-    questionData = readFile(questionsFileLocation)
+    questionData = readFile(questionFileLocation)
 
     # message2 = ""
     # looping ini sisa 1 question dg quiz-id sama, belum bisa semua hapus dalam 1 for(karena out of range)
@@ -119,7 +119,7 @@ def deleteQuiz(quizId):
             # message2 = " dan menghapus semua questionnya "
             break
 
-    writeFile(questionsFileLocation, questionData)
+    writeFile(questionFileLocation, questionData)
 
     return jsonify(quizData)
 

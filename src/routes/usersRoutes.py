@@ -1,7 +1,7 @@
 from flask import request, json, jsonify
 import os
 
-from . import router, usersFileLocation
+from . import router, usersFileLocation, questionFileLocation
 
 from ..utils.crypt import encrypt, decrypt
 from ..utils.file import readFile, writeFile
@@ -33,6 +33,7 @@ def registration():
                 isUsernameOrEmailUsed = True
     
     if not isUsernameOrEmailUsed:
+        # print("berhasil")
         usersData["total-user-registered"] += 1
         body["password"] = encrypt(body["password"])
         usersData["user-list"].append(body)        
@@ -44,6 +45,14 @@ def registration():
         response["message"] = "username of email is used"
 
     return jsonify(response)
+
+
+@router.route('/users/register', methods=["GET"])
+def getRegister():
+    # body = request.json
+
+    registerData = readFile(usersFileLocation)
+    return jsonify(registerData)
 
 @router.route('/users/login', methods=['POST'])
 def login():
